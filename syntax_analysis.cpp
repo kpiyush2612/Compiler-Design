@@ -2,7 +2,7 @@
 using namespace std;
 
 
-void calculate_first(list<string> grammar,string var,vector<string> &temp)
+void calculate_first(list<string> grammar,string var,list<string> &temp)
 {
     list<string>::iterator it=grammar.begin();
     while(it!=grammar.end())
@@ -11,17 +11,41 @@ void calculate_first(list<string> grammar,string var,vector<string> &temp)
         if(g.substr(0,1)==var)
         {
             string right=g.substr(3);
-            if(islower(right.substr(0,1)[0]))
+            if(!isupper(right.substr(0,1)[0]))
             {
                 temp.push_back(right.substr(0,1));
             }
+            else
+			{
+				if(right.length()==1)
+				{
+					list<string>::iterator it1=grammar.begin();
+					int present=0;
+					while(it1!=grammar.end())
+					{
+						string f=right.substr(0,1)+"->#";
+						if(*it1==f)
+						{present=1;break;}
+					    it1++;
+					}
+					if(present==0)
+						calculate_first(grammar,right,temp);		
+				}
+				
+				else
+				{
+					calculate_first(grammar,right.substr(0,1),temp);
+					temp.remove("#");
+					calculate_first(grammar,right.substr(1),temp);
+					
+				}
 
-
+            }
+       
         }
-        it++;
+		 it++;
     }
 }
-
 void first(list<string> &grammar)   //this function will contain list of vectors
 {
 
@@ -53,10 +77,15 @@ void follow(list<string> grammar)   // this function will return the lost of vec
 
 int main()
 {
-    list<string> a;
-    a.push_back("A->a");
-    a.push_back("B->b");
-    calculate_first(a,"A");
+    list<string> a,b;
+    a.push_back("S->Da");
+    a.push_back("D->b");
+	a.push_back("D->#");
+    calculate_first(a,"s",b);
+    list<string>::iterator i=b.begin();
+    while(i!=b.end())
+    {
+    	cout<<*i<<"\t";
+    	i++;
+    }
 }
-
-
